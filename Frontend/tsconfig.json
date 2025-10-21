@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "target": "esnext",
+    "module": "esnext",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "react-jsx",
+    "types": ["vite/client"],        // 👈 Add this line
+    "baseUrl": ".",                 // 👈 Enable absolute imports
+    "paths": {                      // 👈 Match your vite.config.ts alias
+      "@/*": ["src/*"]
+    }
+  },
+  "include": ["src"]
+}
