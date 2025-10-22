@@ -1,5 +1,5 @@
 import Note from '../models/notes.js';
-import express from 'express';
+
 
 
 
@@ -22,36 +22,28 @@ const getNotes = async (req, res) => {
     }
 };
 
-const createNote = async (req, res) => {
-    try {
-        const title = req.body.title;
-        const content = req.body.content;
-        
+export const createNote = async (req, res) => {
+  try {
+    const { title, content } = req.body;
+
     const newNote = new Note({
-        title,
-        content,
-        createdAt: new Date()
+      title,
+      content,
+      createdAt: new Date(),
+      user: req.user._id, // ✅ important
     });
 
-    console.log(newNote); // Log the new note to verify its structure
-    
     await newNote.save();
 
-        res.status(201).json({
-            success: true,
-            message: 'Note created successfully',
-            data: { title, content, createdAt: new Date() }
-        });
-    
-    } catch (error) {
-        console.log(error); 
-        res.status(500).json({
-            success: false,
-            message: 'Failed to create note',
-            error: error.message
-            
-        });
-    }
+    res.status(201).json({
+      success: true,
+      message: 'Note created successfully',
+      data: newNote,
+    });
+  } catch (err) {
+    console.error('Error creating note:', err);
+    res.status(500).json({ success: false, message: 'Server Error' });
+  }
 };
 
 const updateNote = async (req, res) => {
