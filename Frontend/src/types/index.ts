@@ -1,10 +1,27 @@
-export interface Note {
-  _id: string; // Ensure this matches your MongoDB ID field
-  title: string;
-  content: string;
-  createdAt: Date; // Ensure this matches your date field
+// User type
+export interface User {
+  _id: string;
+  email: string;
+  name: string;
 }
 
-export interface NoteFormProps {
-  onAddNote: (note: Note) => void;
+// Note type  
+export interface Note {
+  _id: string;
+  title: string;
+  content: string;
+  createdAt: string;
+  user?: {
+    _id: string;
+    name: string;
+    email: string;
+  };
+}
+
+// API Response types
+export interface ApiResponse<T> {
+  success: boolean;
+  message: string;
+  data?: T;
+  error?: string;
 }
