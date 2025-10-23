@@ -24,7 +24,12 @@ const Home: React.FC = () => {
       setLoading(true);
       const response = await getNotes();
       if (response.success && response.data) {
-        setNotes(response.data);
+        // Filter to show ONLY notes created by the current user
+        const myNotes = response.data.filter(note => {
+          const noteUserId = typeof note.user === 'string' ? note.user : note.user?._id;
+          return noteUserId === user?._id;
+        });
+        setNotes(myNotes);
       }
     } catch (err) {
       setError('Failed to load notes');
@@ -38,7 +43,8 @@ const Home: React.FC = () => {
     try {
       const response = await createNote({ title, content });
       if (response.success && response.data) {
-        setNotes([response.data, ...notes]);
+        // Re-fetch notes so the newly created note comes back with populated `user`
+        await fetchNotes();
         setShowForm(false);
       }
     } catch (err) {
@@ -53,9 +59,8 @@ const Home: React.FC = () => {
     try {
       const response = await updateNote(editingNote._id, { title, content });
       if (response.success && response.data) {
-        setNotes(notes.map(note => 
-          note._id === editingNote._id ? response.data! : note
-        ));
+        // Re-fetch to ensure populated user and latest data
+        await fetchNotes();
         setEditingNote(null);
         setShowForm(false);
       }
@@ -69,7 +74,8 @@ const Home: React.FC = () => {
     try {
       const response = await deleteNote(id);
       if (response.success) {
-        setNotes(notes.filter(note => note._id !== id));
+        // Re-fetch notes to ensure consistent state
+        await fetchNotes();
       }
     } catch (err) {
       setError('Failed to delete note');

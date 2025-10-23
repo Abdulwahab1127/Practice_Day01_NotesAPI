@@ -50,23 +50,17 @@ Frontend/
 
 ## 🚀 Next Steps - IMPORTANT!
 
-### Step 1: Update API URLs
+### API URLs Are Already Configured! ✅
 
-You need to connect the frontend to your backend. Update these two files:
+The API URLs are already set to:
+- Auth API: `http://localhost:3080` (routes: `/api/user/login`, `/api/user/signup`, `/api/user/me`)
+- Notes API: `http://localhost:3080/api` (routes: `/getnotes`, `/createnote`, etc.)
 
-**File 1: `src/api/auth.ts`** (Line 4)
-```typescript
-const API_BASE_URL = 'YOUR_API_URL_HERE'; // ← Change this to your backend URL!
-```
+If your backend runs on a different port, update these files:
+- `src/api/auth.ts` (line 5): Change `API_BASE_URL`
+- `src/api/notes.ts` (line 4): Change `API_BASE_URL`
 
-**File 2: `src/api/notes.ts`** (Line 4)
-```typescript
-const API_BASE_URL = 'YOUR_API_URL_HERE'; // ← Change this to your backend URL!
-```
-
-Replace `YOUR_API_URL_HERE` with your actual backend URL (e.g., `http://localhost:5000`).
-
-### Step 2: Start Your Backend
+### Step 1: Ensure Backend is Running
 
 Make sure your backend server is running.
 

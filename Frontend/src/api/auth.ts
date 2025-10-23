@@ -1,8 +1,8 @@
 import SignIn from '@/pages/SignIn';
 import { ApiResponse, User } from '../types';
 
-// TODO: Replace with your actual backend URL
-const API_BASE_URL = 'http://localhost:3080/api/user'; // e.g., 'http://localhost:5000'
+// TODO: Replace with your actual backend URL (backend root, not /api/user)
+const API_BASE_URL = 'http://localhost:3080'; // e.g., 'http://localhost:5000'
 
 interface SignInData {
   email: string;
@@ -18,7 +18,7 @@ interface SignUpData {
 export const signIn = async (
   data: SignInData
 ): Promise<ApiResponse<{ token: string; user: User }>> => {
-  const response = await fetch(`${API_BASE_URL}/login`, {
+  const response = await fetch(`${API_BASE_URL}/api/user/login`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -39,7 +39,7 @@ export const signIn = async (
 
 
 export const signUp = async (data: SignUpData): Promise<ApiResponse<{ user: User }>> => {
-  const response = await fetch(`${API_BASE_URL}/signup`, {
+  const response = await fetch(`${API_BASE_URL}/api/user/signup`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -49,6 +49,21 @@ export const signUp = async (data: SignUpData): Promise<ApiResponse<{ user: User
 
   if (!response.ok) {
     throw new Error('Signup failed');
+  }
+
+  return response.json();
+};
+
+export const getMe = async (token: string): Promise<ApiResponse<User>> => {
+  const response = await fetch(`${API_BASE_URL}/api/user/me`, {
+    method: 'GET',
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch current user');
   }
 
   return response.json();

@@ -11,11 +11,14 @@ export interface Note {
   title: string;
   content: string;
   createdAt: string;
-  user?: {
-    _id: string;
-    name: string;
-    email: string;
-  };
+  // The backend may return a populated user object or just a user id string
+  user?:
+    | {
+        _id: string;
+        name: string;
+        email: string;
+      }
+    | string;
 }
 
 // API Response types

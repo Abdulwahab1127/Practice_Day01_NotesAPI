@@ -9,7 +9,26 @@ interface NoteCardProps {
 }
 
 const NoteCard: React.FC<NoteCardProps> = ({ note, currentUserId, onEdit, onDelete }) => {
-  const isOwner = note.user && note.user._id === currentUserId;
+  // note.user may be a populated object, a string id, or an ObjectId-like value.
+  let noteUserId: string | undefined;
+  let noteUserName: string | undefined;
+
+  if (!note.user) {
+    noteUserId = undefined;
+  } else if (typeof note.user === 'string') {
+    noteUserId = note.user;
+  } else if (typeof note.user === 'object') {
+    // If populated object with _id and name
+    const asAny = note.user as any;
+    if (asAny._id) noteUserId = String(asAny._id);
+    else noteUserId = String(asAny);
+
+    if (asAny.name) noteUserName = asAny.name;
+  } else {
+    noteUserId = String(note.user as any);
+  }
+
+  const isOwner = !!noteUserId && noteUserId === currentUserId;
   const formattedDate = new Date(note.createdAt).toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'short',
@@ -48,7 +67,7 @@ const NoteCard: React.FC<NoteCardProps> = ({ note, currentUserId, onEdit, onDele
       
       <div className="flex justify-between items-center text-sm text-gray-500">
         <span>
-          {note.user ? By  : 'Unknown user'}
+          {noteUserName ? `By ${noteUserName}` : noteUserId ? `By ${noteUserId}` : 'Unknown user'}
         </span>
         <span>{formattedDate}</span>
       </div>

@@ -1,5 +1,6 @@
 import User from '../models/users.js';
 import { generateToken,generateHash } from '../utils/generateTokens.js';
+import bcrypt from 'bcryptjs';
 
 
 const signup = async (req, res) => {
@@ -45,27 +46,39 @@ const signup = async (req, res) => {
 const login = async (req, res) => {
   const { email, password } = req.body;
 
+  console.log("Login attempt for email:", email);
+  
   try {
-    // 1️⃣ Check if user exists
-    const user = await User.findOne({ email });
-    if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: "User not found",
-      });
-    }
 
-    // 2️⃣ Compare password securely
+    const user = await User.findOne({ email });
+      console.log("User found:", user);
+      
+    if (!user) {
+        return res.status(404).json({
+          success: false,
+          message: "User not found",
+        });
+      }
+
+          console.log("About to enter isMatch");
     const isMatch = await bcrypt.compare(password, user.password);
+
+    console.log("Password match status:", isMatch);
+    
+    
     if (!isMatch) {
+      console.log("Password mismatch for user:", email);
+      
       return res.status(400).json({
         success: false,
-        message: "Invalid credentials",
+        message: "Invalid credentials, Try Again",
       });
+
     }
 
-    // 3️⃣ Generate JWT (make sure generateToken returns token properly)
-    const token = generateToken(user._id); // ✅ pass user._id or user.id only
+    const token = generateToken(user._id);
+
+    console.log("Generated token for user:", email, token);
 
     // 4️⃣ Send response
     res.status(200).json({
@@ -73,11 +86,7 @@ const login = async (req, res) => {
       message: "Login successful",
       data: {
         token,
-        user: {
-          id: user._id,
-          name: user.name,
-          email: user.email,
-        },
+        userId: user._id.toString(),
       },
     });
   } catch (error) {
@@ -89,8 +98,23 @@ const login = async (req, res) => {
   }
 };
 
+// Return currently authenticated user (populated by protect middleware)
+const me = async (req, res) => {
+  try {
+    if (!req.user) {
+      return res.status(401).json({ success: false, message: 'Not authenticated' });
+    }
+
+    // req.user was set by auth middleware (without password)
+    res.status(200).json({ success: true, data: req.user });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Failed to fetch user', error: error.message });
+  }
+};
+
 
 export default {
-    signup,
-    login
+  signup,
+  login,
+  me
 }

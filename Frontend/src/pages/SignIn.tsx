@@ -2,6 +2,7 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { signIn } from '../api/auth';
+import { getMe } from '../api/auth';
 
 const SignIn: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -20,16 +21,24 @@ const SignIn: React.FC = () => {
       const response = await signIn({ email, password });
       
       if (response.success && response.data) {
-        // Backend returns only token, so create user object from form data
-        // In production, you might want to decode JWT or call a /me endpoint
-        const user = {
-          _id: 'temp-id', // Will be replaced when fetching notes
-          email: email,
-          name: email.split('@')[0] // Temporary name
-        };
-        
-        login(response.data.token, user);
-        navigate('/');
+        const { token } = response.data as { token: string; userId?: string };
+
+        // Fetch full user profile using token
+        try {
+          const meRes = await getMe(token);
+          if (meRes.success && meRes.data) {
+            login(token, meRes.data);
+            navigate('/');
+            return;
+          }
+        } catch (err) {
+          // If /me fails, fallback to minimal user object using userId (loose typing)
+          const userId = (response as any)?.data?.userId || 'unknown';
+          const user = { _id: userId, email, name: email.split('@')[0] };
+          login(token, user);
+          navigate('/');
+          return;
+        }
       } else {
         setError(response.message || 'Login failed');
       }

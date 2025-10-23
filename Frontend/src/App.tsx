@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Home from './pages/Home';
+import OtherNotes from './pages/OtherNotes';
 import SignIn from './pages/SignIn';
 import SignUp from './pages/SignUp';
 import './App.css';
@@ -58,6 +59,16 @@ const App = () => {
               <PublicRoute>
                 <SignUp />
               </PublicRoute>
+            }
+          />
+
+          {/* Other users' notes */}
+          <Route
+            path="/others"
+            element={
+              <ProtectedRoute>
+                <OtherNotes />
+              </ProtectedRoute>
             }
           />
 
