@@ -11,8 +11,12 @@ const PORT = process.env.PORT || 3080;
 //Database Connection
 connectDB();
 
-//Start the server
+//Start the server (for local development)
+if (process.env.NODE_ENV !== 'production') {
+    app.listen(PORT, () => {
+        console.log(`Server is running on port ${PORT}`);
+    });
+}
 
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-});
+// Export for Vercel serverless
+export default app;
